@@ -1,0 +1,3043 @@
+{
+  "name": "SemanticModel",
+  "compatibilityLevel": 1400,
+  "model": {
+    "culture": "fr-FR",
+    "dataSources": [
+      {
+        "type": "structured",
+        "name": "SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase",
+        "connectionDetails": {
+          "protocol": "tds",
+          "address": {
+            "server": "g-ww-b2b-uat-sqlsrv.database.windows.net",
+            "database": "g-ww-b2b-dev-sqldb"
+          },
+          "authentication": null,
+          "query": null
+        },
+        "credential": {
+          "AuthenticationKind": "UsernamePassword",
+          "Username": "b2busersql",
+          "EncryptConnection": true
+        }
+      }
+    ],
+    "tables": [
+      {
+        "name": "B2BAnalytic DimAccount",
+        "columns": [
+          {
+            "name": "IdDimAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAccount"
+          },
+          {
+            "name": "CdpfNumber",
+            "dataType": "string",
+            "sourceColumn": "CdpfNumber"
+          },
+          {
+            "name": "UniqueCode",
+            "dataType": "string",
+            "sourceColumn": "UniqueCode"
+          },
+          {
+            "name": "AccountName",
+            "dataType": "string",
+            "sourceColumn": "AccountName"
+          },
+          {
+            "name": "ParentAccountName",
+            "dataType": "string",
+            "sourceColumn": "ParentAccountName"
+          },
+          {
+            "name": "ParentAccountUniqueCode",
+            "dataType": "string",
+            "sourceColumn": "ParentAccountUniqueCode"
+          },
+          {
+            "name": "AccountOwner",
+            "dataType": "string",
+            "sourceColumn": "AccountOwner"
+          },
+          {
+            "name": "SiteLatitude",
+            "dataType": "double",
+            "sourceColumn": "SiteLatitude"
+          },
+          {
+            "name": "SiteLongitude",
+            "dataType": "double",
+            "sourceColumn": "SiteLongitude"
+          },
+          {
+            "name": "UltimateAccountName",
+            "dataType": "string",
+            "sourceColumn": "UltimateAccountName"
+          },
+          {
+            "name": "UltimateAccountUniqueCode",
+            "dataType": "string",
+            "sourceColumn": "UltimateAccountUniqueCode"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimAccount = Source{[Schema=\"B2BAnalytic\",Item=\"DimAccount\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimAccount"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactProcurement",
+        "columns": [
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "IdDimTimeOrder",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTimeOrder"
+          },
+          {
+            "name": "IdDimTimeDelivery",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTimeDelivery"
+          },
+          {
+            "name": "IdDimTimeReception",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTimeReception"
+          },
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimProduct",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProduct"
+          },
+          {
+            "name": "Quantity",
+            "dataType": "double",
+            "sourceColumn": "Quantity"
+          },
+          {
+            "name": "QuantityUnit",
+            "dataType": "string",
+            "sourceColumn": "QuantityUnit"
+          },
+          {
+            "name": "Volume",
+            "dataType": "double",
+            "sourceColumn": "Volume",
+            "formatString": "### ### ##0"
+          },
+          {
+            "name": "VolumeUnite",
+            "dataType": "string",
+            "sourceColumn": "VolumeUnite"
+          },
+          {
+            "name": "Amount",
+            "dataType": "double",
+            "sourceColumn": "Amount"
+          },
+          {
+            "name": "NetAmount",
+            "dataType": "double",
+            "sourceColumn": "NetAmount"
+          },
+          {
+            "name": "CurrencyCode",
+            "dataType": "string",
+            "sourceColumn": "CurrencyCode"
+          },
+          {
+            "type": "calculated",
+            "name": "VolumeInTon",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": "DIVIDE('B2BAnalytic FactProcurement'[Volume],1000)",
+            "formatString": "### ### ##0.000"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactProcurement = Source{[Schema=\"B2BAnalytic\",Item=\"FactProcurement\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactProcurement"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "FreshVolume",
+            "expression": "CALCULATE(SUM('B2BAnalytic FactProcurement'[Volume]),'B2BAnalytic DimProductGroupHierarchy'[ProductLevel2Code]= \"TOP-02-0001\")",
+            "formatString": "### ### ##0.000"
+          },
+          {
+            "name": "ResponsibleVolume",
+            "expression": "CALCULATE(SUM([Volume]), 'B2BAnalytic DimProduct'[IsResponsible])",
+            "formatString": "### ### ##0.00"
+          },
+          {
+            "name": "FreshPercentage",
+            "expression": "DIVIDE([FreshVolume],SUM('B2BAnalytic FactProcurement'[Volume]))",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "ResponsiblePercentage",
+            "expression": "DIVIDE([ResponsibleVolume],SUM('B2BAnalytic FactProcurement'[Volume]))",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Volume_Bio",
+            "expression": [
+              "",
+              "",
+              "VAR Vol =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Volume] ),",
+              "        'B2BAnalytic DimProductLabel'[CollTer_GroupLabelCode] IN {\"Bio\", \"Bio - Local\"}",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Vol, [Total_Volume] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "Total_Volume",
+            "expression": " SUM ( 'B2BAnalytic FactProcurement'[Volume] )",
+            "formatString": "### ### ##0.000"
+          },
+          {
+            "name": "%_Volume_Local",
+            "expression": [
+              "",
+              "",
+              "VAR Vol =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Volume] ),",
+              "        'B2BAnalytic DimProductLabel'[CollTer_GroupLabelCode] IN {\"Local\", \"Bio - Local\", \"Signes Qualités - Local\"}",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Vol, [Total_Volume] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Volume_EgalimStrict",
+            "expression": [
+              "",
+              "",
+              "VAR Vol =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Volume] ),",
+              "        'B2BAnalytic DimProductLabelGrouping'[Prod_Lab_Grp_Lvl1_Label] = \"Egalim Strict\"",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Vol, [Total_Volume] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Volume_Durable",
+            "expression": [
+              "",
+              "",
+              "VAR Vol =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Volume] ),",
+              "        'B2BAnalytic DimProductLabelGrouping'[Prod_Lab_Grp_Lvl2_Label] = \"Durable\"",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Vol, [Total_Volume] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Volume_Responsable",
+            "expression": [
+              "",
+              "",
+              "VAR Vol =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Volume] ),",
+              "        'B2BAnalytic DimProductLabelGrouping'[Prod_Lab_Grp_Lvl3_Label] = \"Responsable\"",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Vol, [Total_Volume] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "Total_Spend",
+            "expression": " SUM ( 'B2BAnalytic FactProcurement'[Amount] )",
+            "formatString": "### ### ##0.000"
+          },
+          {
+            "name": "%_Spend_Bio",
+            "expression": [
+              "",
+              "",
+              "VAR Spend =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Amount] ),",
+              "        'B2BAnalytic DimProductLabel'[CollTer_GroupLabelCode] IN {\"Bio\", \"Bio - Local\"}",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Spend, [Total_Spend] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Spend_Local",
+            "expression": [
+              "",
+              "",
+              "VAR Spend =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Amount] ),",
+              "        'B2BAnalytic DimProductLabel'[CollTer_GroupLabelCode] IN {\"Local\", \"Bio - Local\", \"Signes Qualités - Local\"}",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Spend, [Total_Spend] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Spend_EgalimStrict",
+            "expression": [
+              "",
+              "",
+              "VAR Spend =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Amount] ),",
+              "        'B2BAnalytic DimProductLabelGrouping'[Prod_Lab_Grp_Lvl1_Label] = \"Egalim Strict\"",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Spend, [Total_Spend] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Spend_Durable",
+            "expression": [
+              "",
+              "",
+              "VAR Spend =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Amount] ),",
+              "        'B2BAnalytic DimProductLabelGrouping'[Prod_Lab_Grp_Lvl2_Label] = \"Durable\"",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Spend, [Total_Spend] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "%_Spend_Responsable",
+            "expression": [
+              "",
+              "",
+              "VAR Spend =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactProcurement'[Amount] ),",
+              "        'B2BAnalytic DimProductLabelGrouping'[Prod_Lab_Grp_Lvl3_Label] = \"Responsable\"",
+              "    )",
+              "    ",
+              "RETURN",
+              "    DIVIDE ( Spend, [Total_Spend] )"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactActivities",
+        "columns": [
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimTunoverType",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTunoverType"
+          },
+          {
+            "name": "Turnover",
+            "dataType": "double",
+            "sourceColumn": "Turnover",
+            "formatString": "### ### ##0.00"
+          },
+          {
+            "name": "ActivityDaysNumber",
+            "dataType": "int64",
+            "sourceColumn": "ActivityDaysNumber",
+            "formatString": "### ### ##0"
+          },
+          {
+            "name": "MealsNumber",
+            "dataType": "int64",
+            "sourceColumn": "MealsNumber",
+            "formatString": "### ### ##0.00"
+          },
+          {
+            "type": "calculated",
+            "name": "Turnover_UK",
+            "dataType": "double",
+            "isDataTypeInferred": false,
+            "expression": [
+              " VAR YearParam =  CONVERT(LEFT('B2BAnalytic FactActivities'[IdDimTime], 4), INTEGER)",
+              "   VAR ExchangeRate = CALCULATE(MAX('B2BAnalytic DimExchangeRate'[YearlyAverageRate]), 'B2BAnalytic DimExchangeRate'[FromCurrencyCode] = \"EUR\", 'B2BAnalytic DimExchangeRate'[ToCurrencyCode] = \"GBP\", 'B2BAnalytic DimExchangeRate'[Year] = YearParam )",
+              "   RETURN 'B2BAnalytic FactActivities'[Turnover] * ExchangeRate"
+            ],
+            "formatString": "### ### ##0.00"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactActivities = Source{[Schema=\"B2BAnalytic\",Item=\"FactActivities\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactActivities"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "AverageTurnoverPerMeals",
+            "expression": [
+              " ",
+              "VAR AvgTurnoverPerMeals = DIVIDE(CALCULATE(SUM('B2BAnalytic FactActivities'[Turnover]),'B2BAnalytic FactActivities'[IdDimTunoverType] <> 1),CALCULATE( SUM('B2BAnalytic FactActivities'[MealsNumber]), 'B2BAnalytic FactActivities'[IdDimTunoverType] = BLANK()))",
+              "",
+              "RETURN IF(ISBLANK(AvgTurnoverPerMeals), 0, AvgTurnoverPerMeals)"
+            ],
+            "formatString": "### ### ##0.00"
+          },
+          {
+            "name": "AverageTurnoverPerMealsType3",
+            "expression": " DIVIDE(CALCULATE(SUM('B2BAnalytic FactActivities'[Turnover]),'B2BAnalytic FactActivities'[IdDimTunoverType] = 3),CALCULATE( SUM('B2BAnalytic FactActivities'[MealsNumber]), 'B2BAnalytic FactActivities'[IdDimTunoverType] = BLANK()))",
+            "formatString": "### ### ##0.00"
+          },
+          {
+            "name": "AverageTurnoverPerMealsType2",
+            "expression": " DIVIDE(CALCULATE(SUM('B2BAnalytic FactActivities'[Turnover]),'B2BAnalytic FactActivities'[IdDimTunoverType] = 2),CALCULATE( SUM('B2BAnalytic FactActivities'[MealsNumber]), 'B2BAnalytic FactActivities'[IdDimTunoverType] = BLANK()))",
+            "formatString": "### ### ##0.00"
+          },
+          {
+            "name": "MealsPerActivityDays",
+            "expression": " IF(ISBLANK(SUMX(SUMMARIZE('B2BAnalytic FactActivities', 'B2BAnalytic FactActivities'[IdDimCustomerAccount], \"AVG\",DIVIDE(SUM('B2BAnalytic FactActivities'[MealsNumber]),SUM('B2BAnalytic FactActivities'[ActivityDaysNumber]))),[AVG])), 0, SUMX(SUMMARIZE('B2BAnalytic FactActivities', 'B2BAnalytic FactActivities'[IdDimCustomerAccount], \"AVG\",DIVIDE(SUM('B2BAnalytic FactActivities'[MealsNumber]),SUM('B2BAnalytic FactActivities'[ActivityDaysNumber]))),[AVG]))",
+            "formatString": "### ### ##0"
+          },
+          {
+            "name": "AverageTurnoverPerMeals_UK",
+            "expression": [
+              " ",
+              "VAR AvgTurnoverPerMeals = DIVIDE(CALCULATE(SUM('B2BAnalytic FactActivities'[Turnover_UK]),'B2BAnalytic FactActivities'[IdDimTunoverType] <> 1),CALCULATE( SUM('B2BAnalytic FactActivities'[MealsNumber]), 'B2BAnalytic FactActivities'[IdDimTunoverType] = BLANK()))",
+              "",
+              "RETURN IF(ISBLANK(AvgTurnoverPerMeals), 0, AvgTurnoverPerMeals)"
+            ],
+            "formatString": "### ### ##0.00"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimTurnoverType",
+        "columns": [
+          {
+            "name": "IdDimTurnoverType",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTurnoverType"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "TurnoverType",
+            "dataType": "string",
+            "sourceColumn": "TurnoverType"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimTurnoverType = Source{[Schema=\"B2BAnalytic\",Item=\"DimTurnoverType\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimTurnoverType"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimTurnoverFormula",
+        "columns": [
+          {
+            "name": "IdDimTurnoverFormula",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTurnoverFormula"
+          },
+          {
+            "name": "IdDimCustomer",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomer"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "FormulaCode",
+            "dataType": "string",
+            "sourceColumn": "FormulaCode"
+          },
+          {
+            "name": "FormulaLibelle",
+            "dataType": "string",
+            "sourceColumn": "FormulaLibelle"
+          },
+          {
+            "name": "SubFormulaCode",
+            "dataType": "string",
+            "sourceColumn": "SubFormulaCode"
+          },
+          {
+            "name": "SubFormulaLibelle",
+            "dataType": "string",
+            "sourceColumn": "SubFormulaLibelle"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimTurnoverFormula = Source{[Schema=\"B2BAnalytic\",Item=\"DimTurnoverFormula\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimTurnoverFormula"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimTime",
+        "dataCategory": "Time",
+        "columns": [
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "Date",
+            "dataType": "dateTime",
+            "isKey": true,
+            "sourceColumn": "Date",
+            "formatString": "Short Date",
+            "annotations": [
+              {
+                "name": "Format",
+                "value": "<Format Format=\"DateTimeShortDatePattern\" />"
+              }
+            ]
+          },
+          {
+            "name": "FiscalMonth",
+            "dataType": "int64",
+            "sourceColumn": "FiscalMonth"
+          },
+          {
+            "name": "LibelleCalendarMonth",
+            "dataType": "string",
+            "sourceColumn": "LibelleCalendarMonth",
+            "sortByColumn": "CalendarMonth"
+          },
+          {
+            "name": "CalendarMonth",
+            "dataType": "int64",
+            "sourceColumn": "CalendarMonth"
+          },
+          {
+            "name": "FiscalQuarter",
+            "dataType": "string",
+            "sourceColumn": "FiscalQuarter"
+          },
+          {
+            "name": "LibelleFiscalQuarter",
+            "dataType": "string",
+            "sourceColumn": "LibelleFiscalQuarter"
+          },
+          {
+            "name": "CalendarQuarter",
+            "dataType": "string",
+            "sourceColumn": "CalendarQuarter"
+          },
+          {
+            "name": "LibelleCalendarQuarter",
+            "dataType": "string",
+            "sourceColumn": "LibelleCalendarQuarter"
+          },
+          {
+            "name": "FiscalSemestre",
+            "dataType": "string",
+            "sourceColumn": "FiscalSemestre"
+          },
+          {
+            "name": "LibelleFiscalSemestre",
+            "dataType": "string",
+            "sourceColumn": "LibelleFiscalSemestre"
+          },
+          {
+            "name": "LibelleCalendarSemestre",
+            "dataType": "string",
+            "sourceColumn": "LibelleCalendarSemestre"
+          },
+          {
+            "name": "CalendarSemestre",
+            "dataType": "string",
+            "sourceColumn": "CalendarSemestre"
+          },
+          {
+            "name": "FiscalYear",
+            "dataType": "int64",
+            "sourceColumn": "FiscalYear"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleCalendarMonthYear",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "'B2BAnalytic DimTime'[LibelleCalendarMonth] &\"  \"& 'B2BAnalytic DimTime'[Year]",
+            "sortByColumn": "CalendarMonthYear"
+          },
+          {
+            "type": "calculated",
+            "name": "CalendarMonthYear",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "'B2BAnalytic DimTime'[Year]&IF(LEN('B2BAnalytic DimTime'[CalendarMonth] ) = 1, \"0\",\"\")&'B2BAnalytic DimTime'[CalendarMonth]"
+          },
+          {
+            "type": "calculated",
+            "name": "YearDepth",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "YEAR(NOW()) -YEAR('B2BAnalytic DimTime'[Date])"
+          },
+          {
+            "type": "calculated",
+            "name": "MonthDepth",
+            "dataType": "int64",
+            "isDataTypeInferred": true,
+            "expression": "DATEDIFF('B2BAnalytic DimTime'[Date],TODAY(),MONTH)"
+          },
+          {
+            "type": "calculated",
+            "name": "CalendarQuarterBis",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "REPLACE('B2BAnalytic DimTime'[CalendarQuarter],1,4,\"Tr\")",
+            "sortByColumn": "CalendarQuarterYear"
+          },
+          {
+            "type": "calculated",
+            "name": "CalendarQuarterYear",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "[Year]&REPLACE(REPLACE('B2BAnalytic DimTime'[CalendarQuarter],1,5,\"\"),2,5,\"\")"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleCalendarMonth_EN",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "SWITCH('B2BAnalytic DimTime'[CalendarMonth],1,\"January\",2,\"February\",3,\"March\",4,\"April\",5,\"May\",6,\"June\",7,\"July\",8,\"August\",9,\"September\",10,\"October\",11,\"November\",12,\"December\")",
+            "sortByColumn": "CalendarMonth"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleCalendarMonthYear_EN",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "'B2BAnalytic DimTime'[LibelleCalendarMonth_EN] &\"  \"& 'B2BAnalytic DimTime'[Year]",
+            "sortByColumn": "CalendarMonthYear"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleCalendarMonth_IT",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "SWITCH('B2BAnalytic DimTime'[CalendarMonth],1,\"Gennaio\",2,\"Febbraio\",3,\"Marzo\",4,\"Aprile\",5,\"Maggio\",6,\"Giugno\",7,\"Luglio\",8,\"Agosto\",9,\"Settembre\",10,\"Ottobre\",11,\"Novembre\",12,\"Dicembre\")",
+            "sortByColumn": "CalendarMonth"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleCalendarMonthYear_IT",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "'B2BAnalytic DimTime'[LibelleCalendarMonth_IT] &\"  \"& 'B2BAnalytic DimTime'[Year]",
+            "sortByColumn": "CalendarMonthYear"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleCalendarMonth_ES",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "SWITCH('B2BAnalytic DimTime'[CalendarMonth],1,\"Enero\",2,\"Febrero\",3,\"Marzo\",4,\"Abril\",5,\"Mayo\",6,\"Junio\",7,\"Julio\",8,\"Agosto\",9,\"Septiembre\",10,\"Octubre\",11,\"Noviembre\",12,\"Diciembre\")",
+            "sortByColumn": "CalendarMonth"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleCalendarMonthYear_ES",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "'B2BAnalytic DimTime'[LibelleCalendarMonth_ES] &\"  \"& 'B2BAnalytic DimTime'[Year]",
+            "sortByColumn": "CalendarMonthYear"
+          },
+          {
+            "name": "AcademicYear",
+            "dataType": "string",
+            "sourceColumn": "AcademicYear"
+          },
+          {
+            "type": "calculated",
+            "name": "LibelleAcademicMonth",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "'B2BAnalytic DimTime'[LibelleCalendarMonth]",
+            "sortByColumn": "AcademicMonth"
+          },
+          {
+            "name": "AcademicMonth",
+            "dataType": "int64",
+            "sourceColumn": "AcademicMonth"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimTime = Source{[Schema=\"B2BAnalytic\",Item=\"DimTime\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimTime"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "MaximumDate",
+            "expression": "Format(LASTDATE('B2BAnalytic DimTime'[Date]),\"dd/MM/YYYY\") "
+          },
+          {
+            "name": "MinimumDate",
+            "expression": "Format(FIRSTDATE('B2BAnalytic DimTime'[Date]),\"dd/MM/YYYY\")  "
+          },
+          {
+            "name": "CurrentYear",
+            "expression": " Year(TODAY())"
+          },
+          {
+            "name": "PreviousYear",
+            "expression": " YEAR(TODAY())-1  "
+          },
+          {
+            "name": "MaximumYear",
+            "expression": "YEAR([MaximumDate])"
+          },
+          {
+            "name": "PreviousMaxYear",
+            "expression": "[MaximumYear]-1"
+          },
+          {
+            "name": "CheckYearFilter",
+            "expression": " IF(ISFILTERED('B2BAnalytic DimTime'[Year]), 1, 0)"
+          },
+          {
+            "name": "FilteredYear",
+            "expression": " IF([CheckYearFilter] = 1, MAX('B2BAnalytic DimTime'[Year]), \"\")"
+          },
+          {
+            "name": "YearFilterCount",
+            "expression": " COUNTROWS(FILTERS('B2BAnalytic DimTime'[Year]))"
+          },
+          {
+            "name": "CustomPreviousYear",
+            "expression": " IF([CheckYearFilter] = 0, \"—— \" & [PreviousMaxYear], \"\")"
+          },
+          {
+            "name": "CustomCurrentYear",
+            "expression": " IF([CheckYearFilter] = 0, \"—— \" & [MaximumYear], \"\")"
+          },
+          {
+            "name": "CustomColor",
+            "expression": [
+              " ",
+              "VAR CurrentYr = CALCULATE('B2BAnalytic DimTime'[MaximumYear], ALL('B2BAnalytic DimTime'[Year]))",
+              "VAR PreviousYr = CALCULATE('B2BAnalytic DimTime'[PreviousMaxYear], ALL('B2BAnalytic DimTime'[Year]))",
+              "",
+              "RETURN IF([CheckYearFilter] = 1 && [FilteredYear] = PreviousYr, ",
+              "\t\t\"#374649\", ",
+              "\t\tIF([CheckYearFilter] = 1 && [FilteredYear] = CurrentYr, \"#01B8AA\", \"#FFFFFF00\")",
+              "\t\t)"
+            ]
+          },
+          {
+            "name": "CustomYear",
+            "expression": " IF([CheckYearFilter] = 1, \"—— \" & MAX('B2BAnalytic DimTime'[Year]), \"\")"
+          },
+          {
+            "name": "ContractualYear",
+            "expression": [
+              " ",
+              "//Measure used by the Activities Catering report. Check if the sum of the indicator value from the FactKPIEntryForm table contains data and if the year column has been filtered.",
+              "",
+              "VAR ContractualDataDisplayCheck = IF([SumIndicatorValue] = \"\", 0, 1)",
+              "",
+              "RETURN IF([CheckYearFilter] = 1 && ContractualDataDisplayCheck = 1, \"—— Contrat \" & MAX('B2BAnalytic DimTime'[Year]), \"\")"
+            ]
+          },
+          {
+            "name": "ContractualYear_IT",
+            "expression": [
+              " ",
+              "//Measure used by the Activities Catering report. Check if the sum of the indicator value from the FactKPIEntryForm table contains data and if the year column has been filtered.",
+              "",
+              "VAR ContractualDataDisplayCheck = IF([SumIndicatorValue] = \"\", 0, 1)",
+              "",
+              "RETURN IF([CheckYearFilter] = 1 && ContractualDataDisplayCheck = 1, \"—— Contratto \" & MAX('B2BAnalytic DimTime'[Year]), \"\")"
+            ]
+          },
+          {
+            "name": "ContractualYear_ES",
+            "expression": [
+              " ",
+              "//Measure used by the Activities Catering report. Check if the sum of the indicator value from the FactKPIEntryForm table contains data and if the year column has been filtered.",
+              "",
+              "VAR ContractualDataDisplayCheck = IF([SumIndicatorValue] = \"\", 0, 1)",
+              "",
+              "RETURN IF([CheckYearFilter] = 1 && ContractualDataDisplayCheck = 1, \"—— Contrato \" & MAX('B2BAnalytic DimTime'[Year]), \"\")"
+            ]
+          },
+          {
+            "name": "ContractualYear_UK",
+            "expression": [
+              " ",
+              "//Measure used by the Activities Catering report. Check if the sum of the indicator value from the FactKPIEntryForm table contains data and if the year column has been filtered.",
+              "",
+              "VAR ContractualDataDisplayCheck = IF([SumIndicatorValue] = \"\", 0, 1)",
+              "",
+              "RETURN IF([CheckYearFilter] = 1 && ContractualDataDisplayCheck = 1, \"—— Contract \" & MAX('B2BAnalytic DimTime'[Year]), \"\")"
+            ]
+          },
+          {
+            "name": "CheckFilters",
+            "expression": [
+              " IF (ISFILTERED('B2BAnalytic DimTime'[Year]) || ",
+              "\t\t    ISFILTERED('B2BAnalytic DimTime'[AcademicYear]) || ",
+              "\t              \t     ISFILTERED('B2BAnalytic DimTime'[LibelleCalendarMonthYear]) ||",
+              "\t              \t     ISFILTERED('B2BAnalytic DimTime'[LibelleCalendarMonthYear_EN]) ||",
+              "\t              \t     ISFILTERED('B2BAnalytic DimTime'[LibelleCalendarMonthYear_ES]) ||",
+              "\t              \t     ISFILTERED('B2BAnalytic DimTime'[LibelleCalendarMonthYear_IT]) ||",
+              "\t                   ISFILTERED('B2BAnalytic DimAccount'[AccountName]),",
+              "\t                   1,",
+              "\t                   0",
+              "\t                   )"
+            ]
+          },
+          {
+            "name": "ResetButtonFillColor",
+            "expression": " IF([CheckFilters], \"#2F978A\", \"#FFFFFF\")"
+          },
+          {
+            "name": "ResetButtonTextColor",
+            "expression": " IF([CheckFilters], \"#FFFFFF\", \"#2F978A\")"
+          },
+          {
+            "name": "DateRange",
+            "expression": [
+              "",
+              "",
+              "VAR MinDate =",
+              "    FORMAT ( CONVERT ( [MinimumDate], DATETIME ), \"mmm yyyy\" )",
+              "    ",
+              "VAR MaxDate =",
+              "    FORMAT ( CONVERT ( [MaximumDate], DATETIME ), \"mmm yyyy\" )",
+              "    ",
+              "VAR Range =",
+              "    \"De \" & UPPER ( LEFT ( MinDate, 1 ) )",
+              "        & RIGHT ( MinDate, LEN ( MinDate ) - 1 ) & \" à \"",
+              "        & UPPER ( LEFT ( MaxDate, 1 ) )",
+              "        & RIGHT ( MaxDate, LEN ( MaxDate ) - 1 )",
+              "        ",
+              "RETURN",
+              "    SELECTEDVALUE ( 'B2BAnalytic DimTime'[LibelleCalendarMonthYear], Range )"
+            ]
+          },
+          {
+            "name": "Selected_Month_Year",
+            "expression": [
+              " ",
+              "SELECTEDVALUE('B2BAnalytic DimTime'[LibelleCalendarMonth]) ",
+              "& \" \" & ",
+              "IF(",
+              "    HASONEFILTER('B2BAnalytic DimTime'[Year]),",
+              "    SELECTEDVALUE('B2BAnalytic DimTime'[Year]),",
+              "     \"\")"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimProductLabelMapping",
+        "columns": [
+          {
+            "name": "IdDimProduct",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProduct"
+          },
+          {
+            "name": "IdDimProductLabel",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductLabel"
+          },
+          {
+            "name": "TagOrderPriorityRank",
+            "dataType": "int64",
+            "sourceColumn": "TagOrderPriorityRank"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimProductLabelMapping = Source{[Schema=\"B2BAnalytic\",Item=\"DimProductLabelMapping\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimProductLabelMapping"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimProductLabel",
+        "columns": [
+          {
+            "name": "IdDimProductLabel",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductLabel"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "LabelCode",
+            "dataType": "string",
+            "sourceColumn": "LabelCode"
+          },
+          {
+            "name": "LabelName",
+            "dataType": "string",
+            "sourceColumn": "LabelName"
+          },
+          {
+            "name": "GroupLabelCode",
+            "dataType": "string",
+            "sourceColumn": "GroupLabelCode"
+          },
+          {
+            "name": "GroupLabelName",
+            "dataType": "string",
+            "sourceColumn": "GroupLabelName"
+          },
+          {
+            "type": "calculated",
+            "name": "GroupLabelCodeIndicator",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": [
+              " IF('B2BAnalytic DimProductLabel'[GroupLabelCode] = \"BIO\"",
+              "            || 'B2BAnalytic DimProductLabel'[GroupLabelCode] = \"Signes de qualité\" ",
+              "            || 'B2BAnalytic DimProductLabel'[GroupLabelCode] = \"Autres EGalim\", 'B2BAnalytic DimProductLabel'[GroupLabelCode] & \" *\", 'B2BAnalytic DimProductLabel'[GroupLabelCode])"
+            ]
+          },
+          {
+            "name": "CollTer_GroupLabelCode",
+            "dataType": "string",
+            "sourceColumn": "CollTer_GroupLabelCode"
+          },
+          {
+            "name": "CollTer_GroupLabelName",
+            "dataType": "string",
+            "sourceColumn": "CollTer_GroupLabelName"
+          },
+          {
+            "name": "TagOrderPriority",
+            "dataType": "int64",
+            "sourceColumn": "TagOrderPriority"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimProductLabel = Source{[Schema=\"B2BAnalytic\",Item=\"DimProductLabel\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimProductLabel"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimProductGroupHierarchy",
+        "columns": [
+          {
+            "name": "IdDimProductGroupHierarchy",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductGroupHierarchy"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "ProductLevel1Code",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel1Code"
+          },
+          {
+            "name": "ProductLevel1Libelle",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel1Libelle"
+          },
+          {
+            "name": "ProductLevel2Code",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel2Code"
+          },
+          {
+            "name": "ProductLevel2Libelle",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel2Libelle"
+          },
+          {
+            "name": "ProductLevel3Code",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel3Code"
+          },
+          {
+            "name": "ProductLevel3Libelle",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel3Libelle"
+          },
+          {
+            "name": "ProductLevel4Code",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel4Code"
+          },
+          {
+            "name": "ProductLevel4Libelle",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel4Libelle"
+          },
+          {
+            "name": "ProductLevel5Code",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel5Code"
+          },
+          {
+            "name": "ProductLevel5Libelle",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel5Libelle"
+          },
+          {
+            "name": "IdDimProductFamilyGroup",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductFamilyGroup"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimProductGroupHierarchy = Source{[Schema=\"B2BAnalytic\",Item=\"DimProductGroupHierarchy\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimProductGroupHierarchy"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimProduct",
+        "columns": [
+          {
+            "name": "IdDimProduct",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProduct"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "ProductCode",
+            "dataType": "string",
+            "sourceColumn": "ProductCode"
+          },
+          {
+            "name": "IdDimProductGroupHierarchy",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductGroupHierarchy"
+          },
+          {
+            "name": "IsResponsible",
+            "dataType": "boolean",
+            "sourceColumn": "IsResponsible"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimProduct = Source{[Schema=\"B2BAnalytic\",Item=\"DimProduct\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimProduct"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimExchangeRate",
+        "columns": [
+          {
+            "name": "FromCurrencyCode",
+            "dataType": "string",
+            "sourceColumn": "FromCurrencyCode"
+          },
+          {
+            "name": "ToCurrencyCode",
+            "dataType": "string",
+            "sourceColumn": "ToCurrencyCode"
+          },
+          {
+            "name": "Year",
+            "dataType": "int64",
+            "sourceColumn": "Year"
+          },
+          {
+            "name": "YearlyAverageRate",
+            "dataType": "double",
+            "sourceColumn": "YearlyAverageRate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimExchangeRate = Source{[Schema=\"B2BAnalytic\",Item=\"DimExchangeRate\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimExchangeRate"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimCustomerAccount",
+        "columns": [
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAccount"
+          },
+          {
+            "name": "IdDimCustomer",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomer"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimCustomerAccount = Source{[Schema=\"B2BAnalytic\",Item=\"DimCustomerAccount\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimCustomerAccount"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimCustomer",
+        "columns": [
+          {
+            "name": "IdDimCustomer",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomer"
+          },
+          {
+            "name": "CdpfNumber",
+            "dataType": "string",
+            "sourceColumn": "CdpfNumber"
+          },
+          {
+            "name": "CdpfName",
+            "dataType": "string",
+            "sourceColumn": "CdpfName"
+          },
+          {
+            "name": "CdpfAddress",
+            "dataType": "string",
+            "sourceColumn": "CdpfAddress"
+          },
+          {
+            "name": "CdpfCity",
+            "dataType": "string",
+            "sourceColumn": "CdpfCity"
+          },
+          {
+            "name": "PyramidLevel1",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel1"
+          },
+          {
+            "name": "PyramidLevel2",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel2"
+          },
+          {
+            "name": "PyramidLevel3",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel3"
+          },
+          {
+            "name": "PyramidLevel4",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel4"
+          },
+          {
+            "name": "PyramidLevel5",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel5"
+          },
+          {
+            "name": "PyramidLevel6",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel6"
+          },
+          {
+            "name": "PyramidLevel7",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel7"
+          },
+          {
+            "name": "PyramidLevel8",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel8"
+          },
+          {
+            "name": "PyramidLevel9",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel9"
+          },
+          {
+            "name": "PyramidLevel1Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel1Libelle"
+          },
+          {
+            "name": "PyramidLevel2Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel2Libelle"
+          },
+          {
+            "name": "PyramidLevel3Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel3Libelle"
+          },
+          {
+            "name": "PyramidLevel4Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel4Libelle"
+          },
+          {
+            "name": "PyramidLevel5Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel5Libelle"
+          },
+          {
+            "name": "PyramidLevel6Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel6Libelle"
+          },
+          {
+            "name": "PyramidLevel7Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel7Libelle"
+          },
+          {
+            "name": "PyramidLevel8Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel8Libelle"
+          },
+          {
+            "name": "PyramidLevel9Libelle",
+            "dataType": "string",
+            "sourceColumn": "PyramidLevel9Libelle"
+          },
+          {
+            "name": "FieldActivityCode",
+            "dataType": "string",
+            "sourceColumn": "FieldActivityCode"
+          },
+          {
+            "name": "FieldActivityLibelle",
+            "dataType": "string",
+            "sourceColumn": "FieldActivityLibelle"
+          },
+          {
+            "name": "CompanyCode",
+            "dataType": "string",
+            "sourceColumn": "CompanyCode"
+          },
+          {
+            "name": "CompanyLibelle",
+            "dataType": "string",
+            "sourceColumn": "CompanyLibelle"
+          },
+          {
+            "name": "CoContractantCode",
+            "dataType": "string",
+            "sourceColumn": "CoContractantCode"
+          },
+          {
+            "name": "CoContractantLibelle",
+            "dataType": "string",
+            "sourceColumn": "CoContractantLibelle"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimCustomer = Source{[Schema=\"B2BAnalytic\",Item=\"DimCustomer\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimCustomer"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimCountry",
+        "columns": [
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "CountryCode",
+            "dataType": "string",
+            "sourceColumn": "CountryCode"
+          },
+          {
+            "name": "CountryName",
+            "dataType": "string",
+            "sourceColumn": "CountryName"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimCountry = Source{[Schema=\"B2BAnalytic\",Item=\"DimCountry\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimCountry"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactHygieneAudit",
+        "columns": [
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimAuditType",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAuditType"
+          },
+          {
+            "name": "IDimActivityArea",
+            "dataType": "int64",
+            "sourceColumn": "IDimActivityArea"
+          },
+          {
+            "name": "RatingHygieneAudits",
+            "dataType": "double",
+            "sourceColumn": "RatingHygieneAudits"
+          },
+          {
+            "name": "HygieneAuditId",
+            "dataType": "int64",
+            "sourceColumn": "HygieneAuditId"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactHygieneAudit = Source{[Schema=\"B2BAnalytic\",Item=\"FactHygieneAudit\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactHygieneAudit"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "AuditNumber",
+            "expression": "DISTINCTCOUNT([HygieneAuditId])",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "AverageRating",
+            "expression": "AVERAGE('B2BAnalytic FactHygieneAudit'[RatingHygieneAudits])",
+            "formatString": "0.0"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactHygieneAnalysis",
+        "columns": [
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimAnalysisType",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAnalysisType"
+          },
+          {
+            "name": "IdDimAnalysisResult",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAnalysisResult"
+          },
+          {
+            "name": "RapportAnalyseId",
+            "dataType": "string",
+            "sourceColumn": "RapportAnalyseId"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactHygieneAnalysis = Source{[Schema=\"B2BAnalytic\",Item=\"FactHygieneAnalysis\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactHygieneAnalysis"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "AnalysisNumber",
+            "expression": "DISTINCTCOUNT([RapportAnalyseId])",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "PositiveAnalysisNumber",
+            "expression": "CALCULATE(DISTINCTCOUNT('B2BAnalytic FactHygieneAnalysis'[RapportAnalyseId]),'B2BAnalytic DimAnalysisResult'[IdDimAnalysisResult] = 2)",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "PositiveAnalysisPercentage",
+            "expression": [
+              "",
+              "",
+              "VAR PositiveAnalysisPer = DIVIDE([PositiveAnalysisNumber],'B2BAnalytic FactHygieneAnalysis'[AnalysisNumber])",
+              "",
+              "RETURN IF(ISBLANK(PositiveAnalysisPer), 0, PositiveAnalysisPer)"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimAuditType",
+        "columns": [
+          {
+            "name": "IdDimAuditType",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAuditType"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "AuditType",
+            "dataType": "string",
+            "sourceColumn": "AuditType"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimAuditType = Source{[Schema=\"B2BAnalytic\",Item=\"DimAuditType\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimAuditType"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimAnalysisType",
+        "columns": [
+          {
+            "name": "IdDimAnalysisType",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAnalysisType"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "AnalysisType",
+            "dataType": "string",
+            "sourceColumn": "AnalysisType"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimAnalysisType = Source{[Schema=\"B2BAnalytic\",Item=\"DimAnalysisType\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimAnalysisType"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimAnalysisResult",
+        "columns": [
+          {
+            "name": "IdDimAnalysisResult",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAnalysisResult"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "HygieneAnalysisResult",
+            "dataType": "string",
+            "sourceColumn": "HygieneAnalysisResult"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimAnalysisResult = Source{[Schema=\"B2BAnalytic\",Item=\"DimAnalysisResult\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimAnalysisResult"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimServiceControlResult",
+        "columns": [
+          {
+            "name": "IdDimServiceControlResult",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceControlResult"
+          },
+          {
+            "name": "ServiceControlResult",
+            "dataType": "int64",
+            "sourceColumn": "ServiceControlResult"
+          },
+          {
+            "name": "ServiceControlResultLabel",
+            "dataType": "string",
+            "sourceColumn": "ServiceControlResultLabel"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimServiceControlResult = Source{[Schema=\"B2BAnalytic\",Item=\"DimServiceControlResult\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimServiceControlResult"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimServiceZone",
+        "columns": [
+          {
+            "name": "IdDimServiceZone",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceZone"
+          },
+          {
+            "name": "ZoneId",
+            "dataType": "int64",
+            "sourceColumn": "ZoneId"
+          },
+          {
+            "name": "ZoneLabel",
+            "dataType": "string",
+            "sourceColumn": "ZoneLabel"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimServiceZone = Source{[Schema=\"B2BAnalytic\",Item=\"DimServiceZone\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimServiceZone"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactServiceProcurement",
+        "columns": [
+          {
+            "name": "IdDimTimeOrder",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTimeOrder"
+          },
+          {
+            "name": "IdDimTimeDelivery",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTimeDelivery"
+          },
+          {
+            "name": "IdDimTimeReception",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTimeReception"
+          },
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimServiceEcoLabel",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceEcoLabel"
+          },
+          {
+            "name": "Volume",
+            "dataType": "double",
+            "sourceColumn": "Volume"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactServiceProcurement = Source{[Schema=\"B2BAnalytic\",Item=\"FactServiceProcurement\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactServiceProcurement"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "IsResponsiblePercentage",
+            "expression": "Divide(CALCULATE(SUM('B2BAnalytic FactServiceProcurement'[Volume]),'B2BAnalytic DimServiceEcoLabel'[IsEcoLabelNonAli] IN { \"CONCENTRE\",\"ECOLABEL\",\"NON CLASSE\"}),CALCULATE(SUM('B2BAnalytic FactServiceProcurement'[Volume]),'B2BAnalytic DimServiceEcoLabel'[IsEcoLabelNonAli] IN { \"CONCENTRE\",\"ECOLABEL\",\"NON CLASSE\",\"PRET A EMPLOI\"}))",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "VolumeResponsible",
+            "expression": " CALCULATE(SUM('B2BAnalytic FactServiceProcurement'[Volume]),'B2BAnalytic DimServiceEcoLabel'[IsEcoLabelNonAli] IN { \"CONCENTRE\",\"ECOLABEL\",\"NON CLASSE\"})",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "VolumeNotResponsible",
+            "expression": " CALCULATE(SUM('B2BAnalytic FactServiceProcurement'[Volume]),'B2BAnalytic DimServiceEcoLabel'[IsEcoLabelNonAli] IN { \"PRET A EMPLOI\"})",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "TotalVolume",
+            "expression": [
+              " CALCULATE(",
+              "                        SUM('B2BAnalytic FactServiceProcurement'[Volume]),",
+              "                        ALLSELECTED('B2BAnalytic FactServiceProcurement'),",
+              "                        ALL('B2BAnalytic DimServiceEcoLabel'[EcoLabelLibelle]),",
+              "                        ('B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 1 ||",
+              "                                'B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 4 ||",
+              "                                'B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 6 ||",
+              "                                'B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 7)",
+              ")"
+            ],
+            "formatString": "### ### ##0.00"
+          },
+          {
+            "name": "PercentageVolume",
+            "expression": [
+              " ",
+              "",
+              "VAR Volume =  CALCULATE(",
+              "                        SUM('B2BAnalytic FactServiceProcurement'[Volume]),",
+              "                        ALLSELECTED('B2BAnalytic FactServiceProcurement'),",
+              "                        FILTER('B2BAnalytic DimServiceEcoLabel',",
+              "                               ('B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 1 ||",
+              "                                'B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 4 ||",
+              "                                'B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 6 ||",
+              "                                'B2BAnalytic DimServiceEcoLabel'[IdDimServiceEcoLabel] = 7)",
+              "                                ))",
+              "",
+              "RETURN DIVIDE(Volume,[TotalVolume])"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "PercentageNotResponsible",
+            "expression": " DIVIDE([VolumeNotResponsible], [TotalVolume])",
+            "formatString": "0.00%;-0.00%;0.00%"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactServiceQuality",
+        "columns": [
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "IdDimServiceZone",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceZone"
+          },
+          {
+            "name": "IdDimServiceControlResult",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceControlResult"
+          },
+          {
+            "name": "ControlResult",
+            "dataType": "int64",
+            "sourceColumn": "ControlResult"
+          },
+          {
+            "name": "RoomId",
+            "dataType": "string",
+            "sourceColumn": "RoomId"
+          },
+          {
+            "name": "ControlsPerMonth",
+            "dataType": "int64",
+            "sourceColumn": "ControlsPerMonth"
+          },
+          {
+            "name": "ControlsPerMonthId",
+            "dataType": "string",
+            "sourceColumn": "ControlsPerMonthId"
+          },
+          {
+            "name": "ControlDate",
+            "dataType": "string",
+            "sourceColumn": "ControlDate"
+          },
+          {
+            "name": "IsAutoControle",
+            "dataType": "string",
+            "sourceColumn": "IsAutoControle"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactServiceQuality = Source{[Schema=\"B2BAnalytic\",Item=\"FactServiceQuality\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactServiceQuality"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "PercentageCompliantControls",
+            "expression": "DIVIDE(CALCULATE(COUNT('B2BAnalytic FactServiceQuality'[IdDimServiceControlResult]),'B2BAnalytic DimServiceControlResult'[IdDimServiceControlResult] =2),COUNT('B2BAnalytic FactServiceQuality'[IdDimServiceControlResult]))",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "AverageControl",
+            "expression": "AVERAGE('B2BAnalytic FactServiceQuality'[ControlResult])/100",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "Classe",
+            "expression": " ( [PercentageCompliantControls]/2+[AverageControl]/4+[PercentageControlsDone]/4) ",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "ControlNumber",
+            "expression": "COUNT('B2BAnalytic FactServiceQuality'[IdDimServiceControlResult])",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "ClasseName",
+            "expression": " IF([Classe] <0.50, \"E\",IF([Classe]<0.60,\"D\",IF([Classe]<0.70,\"C\",IF([Classe]<0.80,\"B\",IF([Classe]>= 0.80,\"A\")))))"
+          },
+          {
+            "name": "MonthlyControl",
+            "expression": [
+              "",
+              "SUMX(",
+              "CALCULATETABLE(",
+              "\tSUMMARIZE(",
+              "\t\t'B2BAnalytic FactServiceQuality',",
+              "\t\t'B2BAnalytic FactServiceQuality'[ControlsPerMonthId],",
+              "\t\t\"MaxControlsPerMonth\",",
+              "\t\tMAX('B2BAnalytic FactServiceQuality'[ControlsPerMonth])",
+              "\t\t), ",
+              "\t\tALLEXCEPT('B2BAnalytic FactServiceQuality','B2BAnalytic FactServiceQuality'[IdDimCustomerAccount],'B2BAnalytic DimAccount'[AccountName])",
+              "\t), [MaxControlsPerMonth]",
+              ")"
+            ],
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "ControlsForSelectedPeriod",
+            "expression": "IF(MIN('B2BAnalytic FactServiceQuality'[IdDimTime] )<> BLANK(),([MonthlyControl] * (DATEDIFF('B2BAnalytic DimTime'[MinimumDate], 'B2BAnalytic DimTime'[MaximumDate], MONTH) + 1)) , 0)",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "NumOfControlsDone",
+            "expression": "COUNT('B2BAnalytic FactServiceQuality'[ControlDate])",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "NumOfControlsNotDone",
+            "expression": "[ControlsForSelectedPeriod] - [NumOfControlsDone]",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "PercentageControlsDone",
+            "expression": "[NumOfControlsDone]/[ControlsForSelectedPeriod]",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "PercentageControlsDoneClass",
+            "expression": "[PercentageControlsDone]/4",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "AverageControlClass",
+            "expression": "[AverageControl]/4",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "NotAverageControl",
+            "expression": "IF([AverageControl] <> BLANK(),1-[AverageControl],BLANK())",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "PercentageCompliantControlsClass",
+            "expression": "[PercentageCompliantControls]/2",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "NumOfMonths",
+            "description": "Do not delete. Required for calculation / debug purposes.",
+            "expression": " (DATEDIFF('B2BAnalytic DimTime'[MinimumDate], 'B2BAnalytic DimTime'[MaximumDate], MONTH) + 1)",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "PercentageControlcontradictoryMoyenne",
+            "expression": "DIVIDE(CALCULATE(AVERAGE('B2BAnalytic FactServiceQuality'[ControlResult]),FILTER('B2BAnalytic FactServiceQuality','B2BAnalytic FactServiceQuality'[IsAutoControle]=\"0\")),100)",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "PercentageContradictoryControlComforme",
+            "expression": [
+              " DIVIDE(CALCULATE(COUNT('B2BAnalytic FactServiceQuality'[ControlResult]),",
+              "FILTER('B2BAnalytic FactServiceQuality',AND ('B2BAnalytic FactServiceQuality'[ControlResult]>= 80 , ",
+              "'B2BAnalytic FactServiceQuality'[IsAutoControle] =\"0\"))),(CALCULATE(COUNT('B2BAnalytic FactServiceQuality'[ControlResult]),",
+              "FILTER('B2BAnalytic FactServiceQuality','B2BAnalytic FactServiceQuality'[IsAutoControle]=\"0\"))))"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "PercentageAutoControlMoyenne",
+            "expression": "DIVIDE(CALCULATE(AVERAGE('B2BAnalytic FactServiceQuality'[ControlResult]),FILTER('B2BAnalytic FactServiceQuality','B2BAnalytic FactServiceQuality'[IsAutoControle]=\"1\")),100)",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "PercentageAutoControlComforme",
+            "expression": [
+              " DIVIDE(CALCULATE(COUNT('B2BAnalytic FactServiceQuality'[ControlResult]),",
+              "FILTER('B2BAnalytic FactServiceQuality',AND ('B2BAnalytic FactServiceQuality'[ControlResult]>= 80 , ",
+              "'B2BAnalytic FactServiceQuality'[IsAutoControle] =\"1\"))),(CALCULATE(COUNT('B2BAnalytic FactServiceQuality'[ControlResult]),",
+              "FILTER('B2BAnalytic FactServiceQuality','B2BAnalytic FactServiceQuality'[IsAutoControle]=\"1\"))))"
+            ],
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "NumOfAutoControl",
+            "expression": [
+              " CALCULATE(COUNT('B2BAnalytic FactServiceQuality'[ControlResult]),",
+              "FILTER('B2BAnalytic FactServiceQuality','B2BAnalytic FactServiceQuality'[IsAutoControle]=\"1\"))"
+            ],
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "NumOfContradictoryControl",
+            "expression": [
+              " CALCULATE(COUNT('B2BAnalytic FactServiceQuality'[ControlResult]),",
+              "FILTER('B2BAnalytic FactServiceQuality','B2BAnalytic FactServiceQuality'[IsAutoControle]=\"0\"))"
+            ],
+            "formatString": "### ### ### ###"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimServiceEcoLabel",
+        "columns": [
+          {
+            "name": "IdDimServiceEcoLabel",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceEcoLabel"
+          },
+          {
+            "name": "IsEcoLabelNonAli",
+            "dataType": "string",
+            "sourceColumn": "IsEcoLabelNonAli"
+          },
+          {
+            "name": "EcoLabelLibelle",
+            "dataType": "string",
+            "sourceColumn": "EcoLabelLibelle"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimServiceEcoLabel = Source{[Schema=\"B2BAnalytic\",Item=\"DimServiceEcoLabel\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimServiceEcoLabel"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactServiceSatisfactionB2B",
+        "columns": [
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "OverallSatisfaction",
+            "dataType": "double",
+            "sourceColumn": "OverallSatisfaction"
+          },
+          {
+            "name": "RecommandationScore",
+            "dataType": "double",
+            "sourceColumn": "RecommandationScore"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactServiceSatisfactionB2B = Source{[Schema=\"B2BAnalytic\",Item=\"FactServiceSatisfactionB2B\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactServiceSatisfactionB2B"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "WeightedAverageServiceSatisfactionB2B",
+            "expression": " AVERAGE('B2BAnalytic FactServiceSatisfactionB2B'[OverallSatisfaction])",
+            "formatString": "0.0"
+          },
+          {
+            "name": "WeightedAverageServiceRecommendationB2B",
+            "expression": " Average('B2BAnalytic FactServiceSatisfactionB2B' [RecommandationScore])",
+            "formatString": "0.0"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactSatisfactionB2C",
+        "columns": [
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "IdDimServiceSurvey",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceSurvey"
+          },
+          {
+            "name": "NumberOfRespondent",
+            "dataType": "int64",
+            "sourceColumn": "NumberOfRespondent",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "SatisfactionRate",
+            "dataType": "double",
+            "sourceColumn": "SatisfactionRate"
+          },
+          {
+            "name": "RecommendationRate",
+            "dataType": "double",
+            "sourceColumn": "RecommendationRate"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactSatisfactionB2C = Source{[Schema=\"B2BAnalytic\",Item=\"FactSatisfactionB2C\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactSatisfactionB2C"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "WeightedAverageSatisfaction",
+            "expression": " Average('B2BAnalytic FactSatisfactionB2C'[SatisfactionRate])/100",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "WeightedAverageRecommendation",
+            "expression": " Average('B2BAnalytic FactSatisfactionB2C'[RecommendationRate])/100 ",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "WeightedAverageNotSatisfaction",
+            "expression": " IF([WeightedAverageSatisfaction] <> BLANK(),1-[WeightedAverageSatisfaction],BLANK())",
+            "formatString": "0.00%;-0.00%;0.00%"
+          },
+          {
+            "name": "NumberOfSatisfaction",
+            "expression": " ('B2BAnalytic FactSatisfactionB2C'[WeightedAverageSatisfaction])* CALCULATE(SUM('B2BAnalytic FactSatisfactionB2C'[NumberOfRespondent]))",
+            "formatString": "### ### ### ###"
+          },
+          {
+            "name": "NumberOfNotSatisfaction",
+            "expression": " (('B2BAnalytic FactSatisfactionB2C'[WeightedAverageNotSatisfaction]))*CALCULATE(SUM('B2BAnalytic FactSatisfactionB2C'[NumberOfRespondent]))",
+            "formatString": "### ### ### ###"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactSatisfactionB2B",
+        "columns": [
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdDimTime",
+            "dataType": "int64",
+            "sourceColumn": "IdDimTime"
+          },
+          {
+            "name": "OverallSatisfaction",
+            "dataType": "double",
+            "sourceColumn": "OverallSatisfaction"
+          },
+          {
+            "name": "RecommandationScore",
+            "dataType": "double",
+            "sourceColumn": "RecommandationScore"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactSatisfactionB2B = Source{[Schema=\"B2BAnalytic\",Item=\"FactSatisfactionB2B\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactSatisfactionB2B"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "WeightedAverageSatisfactionB2B",
+            "expression": " Average ('B2BAnalytic FactSatisfactionB2B'[OverallSatisfaction])",
+            "formatString": "0.0"
+          },
+          {
+            "name": "WeightedAverageRecommendationB2B",
+            "expression": " Average ('B2BAnalytic FactSatisfactionB2B'[RecommandationScore])",
+            "formatString": "0.0"
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimServiceSurvey",
+        "columns": [
+          {
+            "name": "IdDimServiceSurvey",
+            "dataType": "int64",
+            "sourceColumn": "IdDimServiceSurvey"
+          },
+          {
+            "name": "SurveyType",
+            "dataType": "string",
+            "sourceColumn": "SurveyType"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimServiceSurvey = Source{[Schema=\"B2BAnalytic\",Item=\"DimServiceSurvey\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimServiceSurvey"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimKPIIndicator",
+        "columns": [
+          {
+            "name": "IdIndicator",
+            "dataType": "int64",
+            "sourceColumn": "IdIndicator"
+          },
+          {
+            "name": "IndicatorCode",
+            "dataType": "string",
+            "sourceColumn": "IndicatorCode"
+          },
+          {
+            "name": "CultureCode",
+            "dataType": "string",
+            "sourceColumn": "CultureCode"
+          },
+          {
+            "name": "IndicatorLocalizedName",
+            "dataType": "string",
+            "sourceColumn": "IndicatorLocalizedName"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimKPIIndicator = Source{[Schema=\"B2BAnalytic\",Item=\"DimKPIIndicator\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimKPIIndicator"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic FactKPIEntryForm",
+        "columns": [
+          {
+            "name": "IdDimCustomerAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCustomerAccount"
+          },
+          {
+            "name": "IdIndicator",
+            "dataType": "int64",
+            "sourceColumn": "IdIndicator"
+          },
+          {
+            "name": "YearMonth",
+            "dataType": "string",
+            "sourceColumn": "YearMonth"
+          },
+          {
+            "name": "IndicatorValue",
+            "dataType": "double",
+            "sourceColumn": "IndicatorValue",
+            "formatString": "### ### ##0.##"
+          },
+          {
+            "name": "UnitOfMeasureName",
+            "dataType": "string",
+            "sourceColumn": "UnitOfMeasureName"
+          },
+          {
+            "type": "calculated",
+            "name": "IdDimTime",
+            "dataType": "string",
+            "isDataTypeInferred": true,
+            "expression": "'B2BAnalytic FactKPIEntryForm'[YearMonth] & \"01\""
+          },
+          {
+            "type": "calculated",
+            "name": "CurrentYearIndicatorValue",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": "IF(Year(RELATED('B2BAnalytic DimTime'[Date]))=YEAR(MAX('B2BAnalytic DimTime'[Date])),'B2BAnalytic FactKPIEntryForm'[IndicatorValue],0) "
+          },
+          {
+            "type": "calculated",
+            "name": "PreviousYearIndicatorValue",
+            "dataType": "double",
+            "isDataTypeInferred": true,
+            "expression": "IF(Year(RELATED('B2BAnalytic DimTime'[Date]))=YEAR(MAX('B2BAnalytic DimTime'[Date])) -1,'B2BAnalytic FactKPIEntryForm'[IndicatorValue],0) "
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_FactKPIEntryForm = Source{[Schema=\"B2BAnalytic\",Item=\"FactKPIEntryForm\"]}[Data]",
+                "in",
+                "    B2BAnalytic_FactKPIEntryForm"
+              ]
+            }
+          }
+        ],
+        "measures": [
+          {
+            "name": "SumIndicatorValue",
+            "expression": [
+              "",
+              "VAR YearCheck = ISFILTERED('B2BAnalytic DimTime'[Year])",
+              "",
+              "RETURN IF(YearCheck && [YearFilterCount] = 1, SUM('B2BAnalytic FactKPIEntryForm'[IndicatorValue]), \"\")"
+            ],
+            "formatString": "### ### ##0"
+          },
+          {
+            "name": "PreviousYearIndicator",
+            "expression": " SUM('B2BAnalytic FactKPIEntryForm'[PreviousYearIndicatorValue])"
+          },
+          {
+            "name": "KPIIndicator",
+            "expression": [
+              " ",
+              "",
+              "SWITCH(TRUE(),",
+              "\t[CurrentYearIndicator]>[PreviousYearIndicator] && MAX('B2BAnalytic DimKPIIndicator'[IndicatorCode]) = \"RCF_CX001\", 1,",
+              "\t[CurrentYearIndicator]<[PreviousYearIndicator] && MAX('B2BAnalytic DimKPIIndicator'[IndicatorCode]) = \"RCF_CX001\", -1,",
+              "\t[CurrentYearIndicator]>[PreviousYearIndicator], -1,",
+              "\t[CurrentYearIndicator]<[PreviousYearIndicator], 1,",
+              "\t0",
+              "\t)"
+            ]
+          },
+          {
+            "name": "CurrentYearIndicator",
+            "expression": " SUM('B2BAnalytic FactKPIEntryForm'[CurrentYearIndicatorValue])"
+          },
+          {
+            "name": "Display_Smiley",
+            "expression": [
+              "",
+              "VAR SUMIndicatorValues =",
+              "    CALCULATE (",
+              "        SUM ( 'B2BAnalytic FactKPIEntryForm'[IndicatorValue] ),",
+              "        'B2BAnalytic DimKPIIndicator'[IdIndicator] IN { 12, 13, 14, 15 }",
+              "    )",
+              "RETURN",
+              "    IF ( SUMIndicatorValues = 0, \"😃\", \"\" )"
+            ]
+          },
+          {
+            "name": "Display_Message",
+            "expression": [
+              " VAR SUMIndicatorValues = CALCULATE(",
+              "SUM('B2BAnalytic FactKPIEntryForm'[IndicatorValue]),",
+              "'B2BAnalytic DimKPIIndicator'[IdIndicator]  in {12,13,14,15}",
+              ")",
+              "RETURN",
+              "",
+              "IF(",
+              "    SUMIndicatorValues = 0, \"Aucun accident\",\"\"",
+              ")"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimAccountHierarchy",
+        "columns": [
+          {
+            "name": "CdpfNumber",
+            "dataType": "string",
+            "sourceColumn": "CdpfNumber"
+          },
+          {
+            "name": "AccountName",
+            "dataType": "string",
+            "sourceColumn": "AccountName"
+          },
+          {
+            "name": "UniqueCodeName",
+            "dataType": "string",
+            "sourceColumn": "UniqueCodeName"
+          },
+          {
+            "name": "UniqueCode",
+            "dataType": "string",
+            "sourceColumn": "UniqueCode"
+          },
+          {
+            "name": "ParentName",
+            "dataType": "string",
+            "sourceColumn": "ParentName"
+          },
+          {
+            "name": "ParentUniqueCode",
+            "dataType": "string",
+            "sourceColumn": "ParentUniqueCode"
+          },
+          {
+            "name": "IdDimAccount",
+            "dataType": "int64",
+            "sourceColumn": "IdDimAccount"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimAccountHierarchy = Source{[Schema=\"B2BAnalytic\",Item=\"DimAccountHierarchy\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimAccountHierarchy"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimProductFamilyGroup",
+        "columns": [
+          {
+            "name": "IdDimProductFamilyGroup",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductFamilyGroup"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "ProductLevel3Code",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel3Code"
+          },
+          {
+            "name": "ProductLevel3Libelle",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel3Libelle"
+          },
+          {
+            "name": "ProductLevel3Famille",
+            "dataType": "string",
+            "sourceColumn": "ProductLevel3Famille"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimProductFamilyGroup = Source{[Schema=\"B2BAnalytic\",Item=\"DimProductFamilyGroup\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimProductFamilyGroup"
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "name": "B2BAnalytic DimProductLabelGrouping",
+        "columns": [
+          {
+            "name": "IdDimProductLabelGrouping",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductLabelGrouping"
+          },
+          {
+            "name": "IdDimProductLabel",
+            "dataType": "int64",
+            "sourceColumn": "IdDimProductLabel"
+          },
+          {
+            "name": "IdDimCountry",
+            "dataType": "int64",
+            "sourceColumn": "IdDimCountry"
+          },
+          {
+            "name": "LabelCode",
+            "dataType": "string",
+            "sourceColumn": "LabelCode"
+          },
+          {
+            "name": "Prod_Lab_Grp_Lvl1_Label",
+            "dataType": "string",
+            "sourceColumn": "Prod_Lab_Grp_Lvl1_Label"
+          },
+          {
+            "name": "Prod_Lab_Grp_Lvl2_Label",
+            "dataType": "string",
+            "sourceColumn": "Prod_Lab_Grp_Lvl2_Label"
+          },
+          {
+            "name": "Prod_Lab_Grp_Lvl3_Label",
+            "dataType": "string",
+            "sourceColumn": "Prod_Lab_Grp_Lvl3_Label"
+          }
+        ],
+        "partitions": [
+          {
+            "name": "Partition",
+            "dataView": "full",
+            "source": {
+              "type": "m",
+              "expression": [
+                "let",
+                "    Source = #\"SQL/WIN-IVRDOP0BKD\\MSSQLSERVER2017;B2BPortalDatabase\",",
+                "    B2BAnalytic_DimProductLabelGrouping = Source{[Schema=\"B2BAnalytic\",Item=\"DimProductLabelGrouping\"]}[Data]",
+                "in",
+                "    B2BAnalytic_DimProductLabelGrouping"
+              ]
+            }
+          }
+        ]
+      }
+    ],
+    "relationships": [
+      {
+        "name": "978df26b-1c32-404b-a555-78f90df1855a",
+        "fromTable": "B2BAnalytic DimCustomerAccount",
+        "fromColumn": "IdDimCustomer",
+        "toTable": "B2BAnalytic DimCustomer",
+        "toColumn": "IdDimCustomer",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "06d75f76-2eec-43e2-80a3-624c28ffee9e",
+        "fromTable": "B2BAnalytic DimProductLabelMapping",
+        "fromColumn": "IdDimProductLabel",
+        "toTable": "B2BAnalytic DimProductLabel",
+        "toColumn": "IdDimProductLabel",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "68bf132d-fbe2-4213-907c-27af1f3b410d",
+        "fromTable": "B2BAnalytic FactActivities",
+        "fromColumn": "IdDimTunoverType",
+        "toTable": "B2BAnalytic DimTurnoverType",
+        "toColumn": "IdDimTurnoverType",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "5079980b-30dc-48b0-9c11-4f605d86c353",
+        "fromTable": "B2BAnalytic DimTurnoverFormula",
+        "fromColumn": "IdDimCustomer",
+        "toTable": "B2BAnalytic DimCustomer",
+        "toColumn": "IdDimCustomer",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "a3d99cad-e433-4f67-b1c5-d8cad2b8e761",
+        "fromTable": "B2BAnalytic DimCustomerAccount",
+        "fromColumn": "IdDimAccount",
+        "toTable": "B2BAnalytic DimAccount",
+        "toColumn": "IdDimAccount",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "72ae7b57-2e08-4a9a-be32-a88521024323",
+        "fromTable": "B2BAnalytic FactProcurement",
+        "fromColumn": "IdDimTimeReception",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "6dbcfe8e-23dc-48fd-9566-489c856d6e47",
+        "fromTable": "B2BAnalytic FactActivities",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "881e9a2d-0c86-455e-85be-60dfab79f0e3",
+        "fromTable": "B2BAnalytic FactActivities",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "48509c92-844a-43a0-a0ed-a3542d1331cc",
+        "fromTable": "B2BAnalytic FactProcurement",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "453352c1-2d00-4b2d-9bfe-a3df0071dfc7",
+        "fromTable": "B2BAnalytic FactHygieneAnalysis",
+        "fromColumn": "IdDimAnalysisType",
+        "toTable": "B2BAnalytic DimAnalysisType",
+        "toColumn": "IdDimAnalysisType",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "f28fe109-82e8-40a0-b17e-1d195178e972",
+        "fromTable": "B2BAnalytic FactHygieneAnalysis",
+        "fromColumn": "IdDimAnalysisResult",
+        "toTable": "B2BAnalytic DimAnalysisResult",
+        "toColumn": "IdDimAnalysisResult",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "c1726ae2-f647-4482-bc62-4369a558d438",
+        "fromTable": "B2BAnalytic FactHygieneAudit",
+        "fromColumn": "IdDimAuditType",
+        "toTable": "B2BAnalytic DimAuditType",
+        "toColumn": "IdDimAuditType",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "92955efe-3f24-4479-8e85-dfdd18ea4cfb",
+        "fromTable": "B2BAnalytic FactHygieneAnalysis",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "23a1f584-c4d4-4f4e-9af4-65dd0cb53612",
+        "fromTable": "B2BAnalytic FactHygieneAudit",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "8eb100eb-1ff8-4e29-a85d-ba21333b2113",
+        "fromTable": "B2BAnalytic FactHygieneAnalysis",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "5f8d2ed3-e617-46a2-bd8f-dc73c8181e38",
+        "fromTable": "B2BAnalytic FactHygieneAudit",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "a36404f2-2a06-42a3-a458-9fd283afa1d1",
+        "fromTable": "B2BAnalytic FactServiceProcurement",
+        "fromColumn": "IdDimTimeReception",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "55f68c6b-34b9-4658-9464-c06629a6e829",
+        "fromTable": "B2BAnalytic FactServiceProcurement",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "f797b727-a29a-4bbf-bdd4-33919b36193d",
+        "fromTable": "B2BAnalytic FactServiceQuality",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "1ce8745a-8895-4342-bb6c-5400347f7cfe",
+        "fromTable": "B2BAnalytic FactServiceQuality",
+        "fromColumn": "IdDimServiceControlResult",
+        "toTable": "B2BAnalytic DimServiceControlResult",
+        "toColumn": "IdDimServiceControlResult",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "ee1b47f3-a873-43bf-85b3-38668760958e",
+        "fromTable": "B2BAnalytic FactServiceQuality",
+        "fromColumn": "IdDimServiceZone",
+        "toTable": "B2BAnalytic DimServiceZone",
+        "toColumn": "IdDimServiceZone",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "1696b20c-7177-40b7-950d-1a8f0bfa1aaa",
+        "fromTable": "B2BAnalytic FactServiceProcurement",
+        "fromColumn": "IdDimServiceEcoLabel",
+        "toTable": "B2BAnalytic DimServiceEcoLabel",
+        "toColumn": "IdDimServiceEcoLabel",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "7a1a93e9-725d-457e-88e0-1f752f6837cb",
+        "fromTable": "B2BAnalytic FactSatisfactionB2C",
+        "fromColumn": "IdDimServiceSurvey",
+        "toTable": "B2BAnalytic DimServiceSurvey",
+        "toColumn": "IdDimServiceSurvey",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "9d13981d-6f7d-4339-b9fa-dfb94797ca79",
+        "fromTable": "B2BAnalytic FactSatisfactionB2C",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "bb53f5c9-5b3e-4139-9fca-534f19628ef9",
+        "fromTable": "B2BAnalytic FactSatisfactionB2B",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "8ea18d58-c545-4f7d-bd1e-7f14b4ad5a94",
+        "fromTable": "B2BAnalytic FactSatisfactionB2C",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "bc67214d-8a56-44df-a121-24d8673d2a36",
+        "fromTable": "B2BAnalytic FactServiceSatisfactionB2B",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "3000e1f6-ea00-4f58-a6ef-98611da9af7d",
+        "fromTable": "B2BAnalytic FactServiceSatisfactionB2B",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "b97915df-4e47-4526-b930-b79d7dbb271e",
+        "fromTable": "B2BAnalytic FactSatisfactionB2B",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "0f50bfc4-cc47-4422-bcb9-6e6d30e839f8",
+        "fromTable": "B2BAnalytic FactServiceQuality",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "af1a113a-1809-4049-a582-e7b9bd5099c6",
+        "fromTable": "B2BAnalytic FactKPIEntryForm",
+        "fromColumn": "IdIndicator",
+        "toTable": "B2BAnalytic DimKPIIndicator",
+        "toColumn": "IdIndicator"
+      },
+      {
+        "name": "9c871785-ddbb-47d7-ad89-884e6c5ccf3c",
+        "fromTable": "B2BAnalytic FactKPIEntryForm",
+        "fromColumn": "IdDimTime",
+        "toTable": "B2BAnalytic DimTime",
+        "toColumn": "IdDimTime"
+      },
+      {
+        "name": "5603f04c-7929-4406-9b9a-e65db5d11ba1",
+        "fromTable": "B2BAnalytic FactKPIEntryForm",
+        "fromColumn": "IdDimCustomerAccount",
+        "toTable": "B2BAnalytic DimCustomerAccount",
+        "toColumn": "IdDimCustomerAccount"
+      },
+      {
+        "name": "9e806bc5-9759-4f9f-a9a9-f328b60bc185",
+        "fromTable": "B2BAnalytic FactProcurement",
+        "fromColumn": "IdDimCountry",
+        "toTable": "B2BAnalytic DimCountry",
+        "toColumn": "IdDimCountry",
+        "isActive": false,
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "cacb65fb-12c6-4f21-ab8c-114da8666ed0",
+        "fromTable": "B2BAnalytic DimTurnoverType",
+        "fromColumn": "IdDimCountry",
+        "toTable": "B2BAnalytic DimCountry",
+        "toColumn": "IdDimCountry"
+      },
+      {
+        "name": "7c223cb1-23b5-4d63-9d18-511e474c7cd8",
+        "fromTable": "B2BAnalytic DimAccountHierarchy",
+        "fromColumn": "IdDimAccount",
+        "toTable": "B2BAnalytic DimAccount",
+        "toColumn": "IdDimAccount",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "48f5d4ea-ac07-4ea9-853b-b7eb84ff4973",
+        "fromTable": "B2BAnalytic DimProduct",
+        "fromColumn": "IdDimProductGroupHierarchy",
+        "toTable": "B2BAnalytic DimProductGroupHierarchy",
+        "toColumn": "IdDimProductGroupHierarchy",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "270ba3a9-562f-4405-8136-4b69ba74f67e",
+        "fromTable": "B2BAnalytic DimProductLabelMapping",
+        "fromColumn": "IdDimProduct",
+        "toTable": "B2BAnalytic DimProduct",
+        "toColumn": "IdDimProduct",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "c68f0785-7be9-40dc-8226-56b66c839b97",
+        "fromTable": "B2BAnalytic DimProductGroupHierarchy",
+        "fromColumn": "IdDimCountry",
+        "toTable": "B2BAnalytic DimCountry",
+        "toColumn": "IdDimCountry"
+      },
+      {
+        "name": "6cc45e1b-fbaa-42c2-84f8-9aebb83a9715",
+        "fromTable": "B2BAnalytic DimProductGroupHierarchy",
+        "fromColumn": "IdDimProductFamilyGroup",
+        "toTable": "B2BAnalytic DimProductFamilyGroup",
+        "toColumn": "IdDimProductFamilyGroup",
+        "crossFilteringBehavior": "bothDirections"
+      },
+      {
+        "name": "cd56948d-ce79-47fd-b6a4-97363b7d484b",
+        "fromTable": "B2BAnalytic FactProcurement",
+        "fromColumn": "IdDimProduct",
+        "toTable": "B2BAnalytic DimProduct",
+        "toColumn": "IdDimProduct"
+      },
+      {
+        "name": "4c450f0d-e2e7-40dc-9993-6eba5e155a91",
+        "fromCardinality": "one",
+        "fromTable": "B2BAnalytic DimProductLabel",
+        "fromColumn": "IdDimProductLabel",
+        "toTable": "B2BAnalytic DimProductLabelGrouping",
+        "toColumn": "IdDimProductLabel",
+        "crossFilteringBehavior": "bothDirections"
+      }
+    ],
+    "roles": [
+      {
+        "name": "RoleUniqueCode",
+        "modelPermission": "read",
+        "members": [
+          {
+            "memberName": "app:2f56c68f-eccc-4d94-b55c-77e782ae77af@0e3d950c-f028-43ec-963b-c060275e6bbc",
+            "memberId": "app:2f56c68f-eccc-4d94-b55c-77e782ae77af@0e3d950c-f028-43ec-963b-c060275e6bbc",
+            "identityProvider": "AzureAD"
+          },
+          {
+            "memberName": "app:b24a6298-e673-4671-a239-6fb4fb4cd2ab@0e3d950c-f028-43ec-963b-c060275e6bbc",
+            "memberId": "app:b24a6298-e673-4671-a239-6fb4fb4cd2ab@0e3d950c-f028-43ec-963b-c060275e6bbc",
+            "identityProvider": "AzureAD"
+          }
+        ],
+        "tablePermissions": [
+          {
+            "name": "B2BAnalytic DimAccountHierarchy",
+            "filterExpression": " 'B2BAnalytic DimAccountHierarchy'[ParentUniqueCode] = CUSTOMDATA() || 'B2BAnalytic DimAccountHierarchy'[UniqueCode] = CUSTOMDATA()"
+          }
+        ]
+      }
+    ],
+    "annotations": [
+      {
+        "name": "ClientCompatibilityLevel",
+        "value": "500"
+      }
+    ]
+  },
+  "id": "SemanticModel"
+}
